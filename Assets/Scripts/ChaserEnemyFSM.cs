@@ -120,11 +120,7 @@ public class ChaserEnemyFSM : MonoBehaviour
                     curState = FSMState.Race;
                 }
             }
-            /*
-            for (int i = 0; i < path.corners.Length - 1; i++) {
-                Debug.DrawLine(path.corners[i], path.corners[i + 1], Color.red);
-            }
-            */
+
 
 			// When the distance is near, transition to attack state
 			float dist = Vector3.Distance(transform.position, playerTransform.position);

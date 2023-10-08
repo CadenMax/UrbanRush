@@ -80,7 +80,6 @@ public class PusherEnemy : MonoBehaviour
     protected void UpdateRaceState()
     {
         if (!setDest) {
-            Debug.Log("Racing");
             nav.SetDestination(targetTransform.position);
             setDest = true;
         }

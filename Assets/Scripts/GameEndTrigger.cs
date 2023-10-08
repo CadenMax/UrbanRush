@@ -5,13 +5,14 @@ using UnityEngine.SceneManagement;
 
 public class GameEndTrigger : MonoBehaviour
 {
-    public string Leaderboard;  // Name of the scene to transition to
+    public string nextSceneName;
 
     private void OnTriggerEnter(Collider other)
     {
-        if (other.CompareTag("Player"))  // assuming your player has the tag "Player"
+        if (other.CompareTag("Player"))
         {
-            SceneManager.LoadScene(Leaderboard);
+            PlayerPrefs.SetFloat("ElapsedTime", TimerScript.elapsedTime);
+            SceneManager.LoadScene(nextSceneName);
         }
     }
 }
