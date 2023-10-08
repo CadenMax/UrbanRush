@@ -8,6 +8,7 @@ TagManager:
   - Fire
   - Vaultable
   - Wallrun
+  - Jump
   layers:
   - Default
   - TransparentFX
