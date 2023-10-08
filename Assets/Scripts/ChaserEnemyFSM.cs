@@ -44,8 +44,8 @@ public class ChaserEnemyFSM : MonoBehaviour
         curState = FSMState.Race;
 
         blockRange = 5.0f;
-        ForwardSpeed = 2.0f;
-        StrafeSpeed = 5.0f;
+        ForwardSpeed = 5.0f;
+        StrafeSpeed = 8.0f;
 
         // Get the target enemy(Player)
         objPlayer = GameObject.FindGameObjectWithTag("Player");
@@ -93,7 +93,7 @@ public class ChaserEnemyFSM : MonoBehaviour
         // When the distance is near, transition to chase state
 		if(objPlayer != null)
         {
-			if (Vector3.Distance(transform.position, playerTransform.position) <= 5.0f)
+			if (Vector3.Distance(transform.position, playerTransform.position) <= blockRange)
 			{
 				curState = FSMState.Obstruct;
 			}
