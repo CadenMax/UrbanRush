@@ -27,7 +27,7 @@ public class PusherEnemy : MonoBehaviour
     void Start()
     {
         currentState = EnemyState.Chase;
-
+        
         playerTransform = GameObject.FindGameObjectWithTag("Player").transform;
         targetTransform = finishLine.transform;
         playerRigidbody = playerTransform.GetComponent<Rigidbody>();
@@ -69,30 +69,22 @@ public class PusherEnemy : MonoBehaviour
         // If the player is within chase range, start chasing
         if (distanceToPlayer <= chaseRange)
         {
-            nav.SetDestination(playerTransform.position);
 
             // Check if the player is in the push radius, transition to Push state if true
-            if (distanceToPlayer <= pushRadius)
-            {
+            if (distanceToPlayer <= pushRadius) {
                 currentState = EnemyState.Push;
+            } else {
+                nav.SetDestination(playerTransform.position);
             }
-        }
-    }
-
-    protected void UpdateRaceState()
-    {
-        float distanceToFinish = Vector3.Distance(transform.position, targetTransform.position);
-
-        if (distanceToFinish <= nav.stoppingDistance)
-        {
-            // AI reached the finish line
-            // currentState = EnemyState.Finish; // assuming you add a Finish state
         }
         else
         {
             nav.SetDestination(targetTransform.position);
         }
+    }
 
+    protected void UpdateRaceState()
+    {
         float distanceToPlayer = Vector3.Distance(transform.position, playerTransform.position);
         if (distanceToPlayer <= chaseRange)
         {
