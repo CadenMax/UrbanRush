@@ -27,7 +27,7 @@ public class PusherEnemy : MonoBehaviour
      void Start()
     {
         currentState = EnemyState.Chase;
-
+        
         playerTransform = GameObject.FindGameObjectWithTag("Player").transform;
         targetTransform = finishLine.transform;
         playerRigidbody = playerTransform.GetComponent<Rigidbody>();
@@ -61,16 +61,12 @@ public class PusherEnemy : MonoBehaviour
         // If the player is within chase range, start chasing
         if (distanceToPlayer <= chaseRange)
         {
-            nav.SetDestination(playerTransform.position);
 
             // Check if the player is in the push radius, transition to Push state if true
-            if (distanceToPlayer <= pushRadius)
-            {
+            if (distanceToPlayer <= pushRadius) {
                 currentState = EnemyState.Push;
-            }
-            else
-            {
-                currentState = EnemyState.Chase;
+            } else {
+                nav.SetDestination(playerTransform.position);
             }
         }
         else
@@ -78,9 +74,9 @@ public class PusherEnemy : MonoBehaviour
             currentState = EnemyState.Race;
         }
     }
+
     protected void UpdateRaceState()
     {
-
         float distanceToPlayer = Vector3.Distance(transform.position, playerTransform.position);
         {
             if (distanceToPlayer > chaseRange)
@@ -93,6 +89,7 @@ public class PusherEnemy : MonoBehaviour
             }
         }
     }
+
     protected void UpdatePushState()
     {
         float distanceToPlayer = Vector3.Distance(transform.position, playerTransform.position);
