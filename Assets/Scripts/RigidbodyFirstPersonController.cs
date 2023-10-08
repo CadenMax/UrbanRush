@@ -65,17 +65,6 @@ namespace UnityStandardAssets.Characters.FirstPerson
         private float m_YRotation;
         private bool  m_IsGrounded;
 
-        // Slide variables
-        public bool isSliding = false;
-        public float slideDuration = 1.0f;
-        private float slideTimer = 0.0f;
-        public float slideSpeed = 12.0f;  // Adjust as needed
-        private Vector3 originalColliderSize;
-        private Vector3 slideColliderSize;
-        public KeyCode slideKey = KeyCode.LeftControl;  // Set to the key you want for sliding
-
-
-
         public Vector3 Velocity
         {
             get { return m_RigidBody.velocity; }
@@ -96,9 +85,6 @@ namespace UnityStandardAssets.Characters.FirstPerson
             m_RigidBody = GetComponent<Rigidbody>();
             m_Capsule = GetComponent<CapsuleCollider>();
             mouseLook.Init (transform, cam.transform);
-            // Initialize slide collider size based on your player's size
-            originalColliderSize = m_Capsule.bounds.size;
-            slideColliderSize = new Vector3(originalColliderSize.x, originalColliderSize.y * 0.5f, originalColliderSize.z);
         }
 
 
@@ -112,8 +98,6 @@ namespace UnityStandardAssets.Characters.FirstPerson
                 {
                     NormalJump();
                 }
-
-                HandleSlide();
 
             }
 
@@ -255,50 +239,5 @@ namespace UnityStandardAssets.Characters.FirstPerson
             }
         }
 
-        void HandleSlide()
-        {
-            if (Input.GetKeyDown(slideKey) && !isSliding && m_IsGrounded)  // Check for slide key press and conditions
-            {
-                StartSlide();
-            }
-
-            if (isSliding)
-            {
-                slideTimer += Time.deltaTime;
-                
-                if (slideTimer >= slideDuration)
-                {
-                    EndSlide();
-                }
-            }
-        }
-
-        void StartSlide()
-        {
-            isSliding = true;
-
-            // Adjust player's speed and collider size
-            m_RigidBody.velocity = transform.forward * slideSpeed;  // Make the player move forward during the slide
-            
-            // Store the original height and center
-            float originalHeight = m_Capsule.height;
-            Vector3 originalCenter = m_Capsule.center;
-
-            // Set the height to half its original size
-            m_Capsule.height = originalHeight * 0.5f;
-
-            // Adjust the center position so the bottom of the capsule remains at the same position
-            m_Capsule.center = new Vector3(originalCenter.x, originalCenter.y - originalHeight * 0.25f, originalCenter.z);
-        }
-
-        void EndSlide()
-        {
-            isSliding = false;
-            slideTimer = 0.0f;
-
-            // Reset player's collider size to its original values
-            m_Capsule.height = originalColliderSize.y;
-            m_Capsule.center = Vector3.zero;  // Assuming the original center was (0,0,0)
-        }
     }
 }
