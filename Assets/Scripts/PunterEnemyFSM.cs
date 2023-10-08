@@ -2,7 +2,7 @@ using UnityEngine;
 using System.Collections;
 using UnityEngine.AI;
 
-public class PusherEnemy : MonoBehaviour
+public class PunterEnemy : MonoBehaviour
 {
     public enum EnemyState
     {
