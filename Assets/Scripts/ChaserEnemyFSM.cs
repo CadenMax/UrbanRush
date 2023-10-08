@@ -15,43 +15,40 @@ public class ChaserEnemyFSM : MonoBehaviour
 	// Current state that the NPC is reaching
 	public FSMState curState;
 
-	protected Transform playerTransform;// Player Transform
-	
-	public GameObject[] jumpPoints; // List of waypoints for jumping
+	protected Transform playerTransform; // Player Transform
+    protected Transform targetTransform; // Target Transform
+
+    public GameObject[] jumpPoints; // List of waypoints for jumping
 	public GameObject finishLine;
 
-    // Whether the NPC is destroyed or not
-    protected bool bDead;
-
     public float ForwardSpeed = 8.0f;   // Speed when walking forward
-    public float BackwardSpeed = 4.0f;  // Speed when walking backwards
-    public float StrafeSpeed = 4.0f;    // Speed when walking sideways
-    public float SpeedInAir = 8.0f;   // Speed when onair
-    public float JumpForce = 30f;
 
-	// Ranges for chase and attack
-    public float chaseRange = 35.0f;
+    // Ranges for chase and attack
+    public float blockRange;
 	
 	private NavMeshAgent nav;
 
 	// current waypoint in list
-	private int curWaypoint = -1;
 	private bool setDest = false;
 
-	public float pathCheckTime = 1.0f;
-	private float elapsedPathCheckTime;
+    public Vector3[] results;
 
 	private GameObject objPlayer;
 
-	void Start() {
+    private NavMeshPath path;
+    private float elapsed = 0.0f;
+
+    void Start() {
 
         curState = FSMState.Race;
 
-        bDead = false;
+        blockRange = 5.0f;
 
         // Get the target enemy(Player)
         objPlayer = GameObject.FindGameObjectWithTag("Player");
         playerTransform = objPlayer.transform;
+
+        targetTransform = finishLine.transform;
 
         if(!playerTransform)
             print("Player doesn't exist.. Please add one with Tag named 'Player'");
@@ -59,21 +56,22 @@ public class ChaserEnemyFSM : MonoBehaviour
 		//reference the navmeshagent so we can access it
 		nav = GetComponent<NavMeshAgent>();
 
-		// if there are waypoints in the list set our destination to be the current waypoint
-		if (jumpPoints.Length > 0)
-			curWaypoint = 0;
+        nav.speed = ForwardSpeed;
 
-		// set to pathCheckTime so it will trigger first time
-		elapsedPathCheckTime = pathCheckTime;
-	}
+        path = new NavMeshPath();
+        elapsed = 0.0f;
+    }
 
 
     // Update each frame
     void Update() {
+        // Update the way to the goal every second.
+        if (transform.position == targetTransform.position) {
+            nav.isStopped = true;
+        }
         switch (curState) {
             case FSMState.Race: UpdateRaceState(); break;
             case FSMState.Obstruct: UpdateObstructState(); break;
-            case FSMState.Dead: UpdateDeadState(); break;
         }
     }
 
@@ -81,71 +79,54 @@ public class ChaserEnemyFSM : MonoBehaviour
      * Patrol state
      */
     protected void UpdateRaceState() {
-        
-		// only move if there are waypoints in list for object
-		if (curWaypoint > -1) {
-			// check if close to current waypoint
-			if (Vector3.Distance(transform.position, jumpPoints[curWaypoint].gameObject.transform.position) <= 2.0f) {
-				// get next waypoint
-				curWaypoint++;
-				// if we have travelled to last waypoint, go back to the first
-				if (curWaypoint > (jumpPoints.Length - 1))
-					curWaypoint = 0;
-
-				setDest = false;
-			}
-
-			if (!setDest) {
-				// NavMeshAgent move
-				nav.SetDestination(jumpPoints[curWaypoint].gameObject.transform.position);
-				setDest = true;
-			}
+		if (!setDest) {
+			// NavMeshAgent move
+			nav.SetDestination(targetTransform.position);
+			setDest = true;
 		}
 
         // Check the distance with player tank
         // When the distance is near, transition to chase state
 		if(objPlayer != null)
         {
-			if (Vector3.Distance(transform.position, playerTransform.position) <= chaseRange)
+			if (Vector3.Distance(transform.position, playerTransform.position) <= 5.0f)
 			{
-
-				// see if playerTank is Line of Sight
-				RaycastHit hit;
-				if (Physics.Linecast(transform.position + new Vector3(0f, 1f, 0f), playerTransform.position + new Vector3(0f, 1f, 0f), out hit))
-				{
-					if (hit.collider.gameObject.tag == "Player")
-					{
-						curState = FSMState.Obstruct;
-					}
-				}
+				curState = FSMState.Obstruct;
 			}
-        }
-        
+        }        
     }
 
 
     /*
-     * Chase state
+     * Obstruct state
 	 */
     protected void UpdateObstructState() {
 
 		if(objPlayer != null)
         {
-			// NavMeshAgent move
-			if (elapsedPathCheckTime >= pathCheckTime)
-			{
-				nav.SetDestination(playerTransform.position);
-				elapsedPathCheckTime = 0f;
-			}
+            // NavMeshAgent move
+            elapsed += Time.deltaTime;
+            if (elapsed > 0.1f) {
+                elapsed = 0f;
+                NavMesh.CalculatePath(playerTransform.position, targetTransform.position, NavMesh.AllAreas, path);
+                if (path.corners[2] != targetTransform.position) {
+                    nav.SetDestination(path.corners[2]);
+                } else {
+                    curState = FSMState.Race;
+                }
+            }
+            /*
+            for (int i = 0; i < path.corners.Length - 1; i++) {
+                Debug.DrawLine(path.corners[i], path.corners[i + 1], Color.red);
+            }
+            */
 
-			// Check the distance with player tank
 			// When the distance is near, transition to attack state
 			float dist = Vector3.Distance(transform.position, playerTransform.position);
-
-			if (dist >= chaseRange) {
-				curState = FSMState.Race;
-				setDest = false;
-			}
+            if (dist > blockRange) {
+                setDest = false;
+                curState = FSMState.Race;
+            }
 		}
         else
         {
@@ -154,22 +135,9 @@ public class ChaserEnemyFSM : MonoBehaviour
 		
 	}
 
-    /*
-     * Dead state
-     */
-    protected void UpdateDeadState() {
-        // Show the dead animation with some physics effects
-        if (!bDead) {
-			nav.isStopped = true;
-			nav.enabled = false;
-            bDead = true;
-        }
+    void OnDrawGizmos()
+    {
+        Gizmos.color = Color.yellow;
+        Gizmos.DrawWireSphere(transform.position, blockRange);
     }
-	/*
-	void OnDrawGizmos () {
-		Gizmos.color = Color.yellow;
-		Gizmos.DrawWireSphere(transform.position, chaseRange);
-	}
-	*/
-
 }
