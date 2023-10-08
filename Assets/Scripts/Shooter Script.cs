@@ -3,20 +3,40 @@ using UnityEngine;
 
 public class ShooterScript : MonoBehaviour
 {
+    public enum FSMState
+    {
+        Patrol,
+        Attack,
+    }
+    public FSMState curState;
+
     public float min = 2f;
     public float max = 3f;
-    public GameObject bulletPrefab;
-    public Transform bulletSpawnPoint;
     public float bulletSpeed = 10f;
     public float fireRate = 1f;
     public float bulletPushForce = 10f;
-    public GameObject triggerZone;
 
-    private bool canShoot = false;
-    private float nextFireTime;
+    protected Transform playerTransform;// Player Transform
+
+    // Turret
+    public GameObject turret;
+    public float turretRotSpeed = 4.0f;
+
+    // Bullet
+    public GameObject bullet;
+    public GameObject bulletSpawnPoint;
+
+    // Bullet shooting rate
+    public float shootRate = 1.0f;
+    protected float elapsedTime;
+
+    public float attackRange = 10.0f;
 
     void Start()
     {
+        curState = FSMState.Patrol;
+        elapsedTime = 0.0f;
+
         min = transform.position.z;
         max = transform.position.z + 20;
         
@@ -26,56 +46,74 @@ public class ShooterScript : MonoBehaviour
             gameObject.AddComponent<BoxCollider>();
         }
 
-        if (triggerZone != null)
-        {
-            triggerZone.GetComponent<BoxCollider>().isTrigger = true;
-        }
+        // Get the target enemy(Player)
+        GameObject objPlayer = GameObject.FindGameObjectWithTag("Player");
+        playerTransform = objPlayer.transform;
+
+        if (!playerTransform)
+            print("Player doesn't exist.. Please add one with Tag named 'Player'");
     }
 
     void Update()
     {
-        // Moving back and forth
+        switch (curState)
+        {
+            case FSMState.Patrol: UpdatePatrolState(); break;
+            case FSMState.Attack: UpdateAttackState(); break;
+        }
+
+        // Update the time
+        elapsedTime += Time.deltaTime;
+    }
+
+    protected void UpdatePatrolState()
+    {
         transform.position = new Vector3(transform.position.x, transform.position.y, Mathf.PingPong(Time.time * 2, max - min) + min);
-        
-        // Shooting at the player
-        if (canShoot && Time.time >= nextFireTime)
+        float dist = Vector3.Distance(transform.position, playerTransform.position);
+
+        if (dist < attackRange)
         {
-            Debug.Log("Firing");
-            Fire();
-            nextFireTime = Time.time + 1f / fireRate;
+            curState = FSMState.Attack;
         }
     }
 
-    void Fire()
+    protected void UpdateAttackState()
     {
-        Debug.Log("Bullet Spawned");
-        GameObject bullet = Instantiate(bulletPrefab, bulletSpawnPoint.position, bulletSpawnPoint.rotation);
-        Rigidbody bulletRigidbody = bullet.GetComponent<Rigidbody>();
-        bulletRigidbody.velocity = bulletSpawnPoint.forward * bulletSpeed;
-
-        Bullet bulletScript = bullet.GetComponent<Bullet>();
-        if (bulletScript != null)
+        // Transitions
+        // Check the distance with the player tank
+        float dist = Vector3.Distance(transform.position, playerTransform.position);
+        if (dist >= attackRange)
         {
-            bulletScript.pushForce = bulletPushForce;
+            curState = FSMState.Patrol;
+        }
+
+        // Always Turn the turret towards the player
+        if (turret)
+        {
+            Quaternion turretRotation = Quaternion.LookRotation(playerTransform.position - transform.position);
+            turret.transform.rotation = Quaternion.Slerp(turret.transform.rotation, turretRotation, Time.deltaTime * turretRotSpeed);
+        }
+
+        // Shoot the bullets
+        ShootBullet();
+    }
+
+    private void ShootBullet()
+    {
+        if (elapsedTime >= shootRate)
+        {
+            if ((bulletSpawnPoint) & (bullet))
+            {
+                // Shoot the bullet
+                Instantiate(bullet, bulletSpawnPoint.transform.position, bulletSpawnPoint.transform.rotation);
+            }
+            elapsedTime = 0.0f;
         }
     }
 
-    void OnTriggerEnter(Collider other)
+    void OnDrawGizmos()
     {
-            Debug.Log("Player Entered");
-        if (other.CompareTag("Player"))
-        {
-            Debug.Log("Player Entered");
-            canShoot = true;
-        }
-    }
-
-    void OnTriggerExit(Collider other)
-    {
-        if (other.CompareTag("Player"))
-        {
-            Debug.Log("Player Exited");
-            canShoot = false;
-        }
+        Gizmos.color = Color.red;
+        Gizmos.DrawWireSphere(transform.position, attackRange);
     }
 }

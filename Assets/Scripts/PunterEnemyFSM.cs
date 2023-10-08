@@ -14,9 +14,9 @@ public class PunterEnemy : MonoBehaviour
 
     public EnemyState currentState;
 
-    public float pushForce = 10.0f; // Force to push the player
+    public float pushForce = 1.5f; // Force to push the player
     public float pushRadius = 2.0f; // Radius to detect the player for pushing
-    public float chaseRange = 10.0f; // Range to start chasing the player
+    public float chaseRange = 3.0f; // Range to start chasing the player
     public GameObject finishLine;
     private Transform playerTransform;
     private Transform targetTransform;
