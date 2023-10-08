@@ -21,7 +21,8 @@ public class ChaserEnemyFSM : MonoBehaviour
     public GameObject[] jumpPoints; // List of waypoints for jumping
 	public GameObject finishLine;
 
-    public float ForwardSpeed = 8.0f;   // Speed when walking forward
+    public float ForwardSpeed = 5.0f;   // Speed when walking forward
+    public float StrafeSpeed = 8.0f;   // Speed when walking forward
 
     // Ranges for chase and attack
     public float blockRange;
@@ -82,6 +83,7 @@ public class ChaserEnemyFSM : MonoBehaviour
 		if (!setDest) {
 			// NavMeshAgent move
 			nav.SetDestination(targetTransform.position);
+            nav.speed = ForwardSpeed;
 			setDest = true;
 		}
 
@@ -111,6 +113,7 @@ public class ChaserEnemyFSM : MonoBehaviour
                 NavMesh.CalculatePath(playerTransform.position, targetTransform.position, NavMesh.AllAreas, path);
                 if (path.corners[2] != targetTransform.position) {
                     nav.SetDestination(path.corners[2]);
+                    nav.speed = StrafeSpeed;
                 } else {
                     curState = FSMState.Race;
                 }
