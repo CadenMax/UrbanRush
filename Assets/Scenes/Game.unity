@@ -1353,8 +1353,8 @@ NavMeshAgent:
   m_Enabled: 1
   m_AgentTypeID: 0
   m_Radius: 0.5
-  m_Speed: 3.5
-  m_Acceleration: 8
+  m_Speed: 1.5
+  m_Acceleration: 1
   avoidancePriority: 50
   m_AngularSpeed: 50
   m_StoppingDistance: 0
@@ -1879,31 +1879,31 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 581404034186543929, guid: 9549794d60197e84b94f01cd8191b387, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 1.6370001
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 581404034186543929, guid: 9549794d60197e84b94f01cd8191b387, type: 3}
       propertyPath: m_LocalPosition.z
-      value: -1.800003
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 581404034186543929, guid: 9549794d60197e84b94f01cd8191b387, type: 3}
       propertyPath: m_LocalRotation.w
-      value: 0.96592593
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 581404034186543929, guid: 9549794d60197e84b94f01cd8191b387, type: 3}
       propertyPath: m_LocalRotation.x
-      value: 0.25881857
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 581404034186543929, guid: 9549794d60197e84b94f01cd8191b387, type: 3}
       propertyPath: m_LocalRotation.y
-      value: -0
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 581404034186543929, guid: 9549794d60197e84b94f01cd8191b387, type: 3}
       propertyPath: m_LocalRotation.z
-      value: -0.00000004470348
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 581404034186543929, guid: 9549794d60197e84b94f01cd8191b387, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
-      value: 30
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 652379833682923242, guid: 9549794d60197e84b94f01cd8191b387, type: 3}
       propertyPath: m_RootOrder
@@ -7574,7 +7574,7 @@ BoxCollider:
   m_LayerOverridePriority: 0
   m_IsTrigger: 0
   m_ProvidesContacts: 0
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 3
   m_Size: {x: 1, y: 1, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
@@ -13602,7 +13602,7 @@ BoxCollider:
   m_LayerOverridePriority: 0
   m_IsTrigger: 0
   m_ProvidesContacts: 0
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 3
   m_Size: {x: 1, y: 1, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
