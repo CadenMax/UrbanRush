@@ -49,15 +49,12 @@ public class PunterEnemy : MonoBehaviour
         {
             case EnemyState.Chase:
                 UpdateChaseState();
-                Debug.Log("chasing");
                 break;
             case EnemyState.Push:
                 UpdatePushState();
-                Debug.Log("pushing");
                 break;
             case EnemyState.Race:
                 UpdateRaceState();
-                Debug.Log("race");
                 break;
         }
     }
