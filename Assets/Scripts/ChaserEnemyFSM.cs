@@ -21,8 +21,8 @@ public class ChaserEnemyFSM : MonoBehaviour
     public GameObject[] jumpPoints; // List of waypoints for jumping
 	public GameObject finishLine;
 
-    public float ForwardSpeed = 5.0f;   // Speed when walking forward
-    public float StrafeSpeed = 8.0f;   // Speed when walking forward
+    public float ForwardSpeed;   // Speed when walking forward
+    public float StrafeSpeed;   // Speed when walking forward
 
     // Ranges for chase and attack
     public float blockRange;
@@ -44,6 +44,8 @@ public class ChaserEnemyFSM : MonoBehaviour
         curState = FSMState.Race;
 
         blockRange = 5.0f;
+        ForwardSpeed = 2.0f;
+        StrafeSpeed = 5.0f;
 
         // Get the target enemy(Player)
         objPlayer = GameObject.FindGameObjectWithTag("Player");
