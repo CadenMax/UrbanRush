@@ -24,7 +24,7 @@ public class PusherEnemy : MonoBehaviour
 
     private NavMeshAgent nav;
 
-     void Start()
+    void Start()
     {
         currentState = EnemyState.Chase;
 
@@ -33,10 +33,18 @@ public class PusherEnemy : MonoBehaviour
         playerRigidbody = playerTransform.GetComponent<Rigidbody>();
 
         nav = GetComponent<NavMeshAgent>();
+        nav.stoppingDistance = 0.1f;
     }
 
-     void Update()
+    void Update()
     {
+        float distanceToPlayer = Vector3.Distance(transform.position, playerTransform.position);
+
+        if (distanceToPlayer > chaseRange && currentState != EnemyState.Race)
+        {
+            currentState = EnemyState.Race;
+        }
+
         switch (currentState)
         {
             case EnemyState.Chase:
@@ -68,31 +76,30 @@ public class PusherEnemy : MonoBehaviour
             {
                 currentState = EnemyState.Push;
             }
-            else
-            {
-                currentState = EnemyState.Chase;
-            }
+        }
+    }
+
+    protected void UpdateRaceState()
+    {
+        float distanceToFinish = Vector3.Distance(transform.position, targetTransform.position);
+
+        if (distanceToFinish <= nav.stoppingDistance)
+        {
+            // AI reached the finish line
+            // currentState = EnemyState.Finish; // assuming you add a Finish state
         }
         else
         {
-            currentState = EnemyState.Race;
+            nav.SetDestination(targetTransform.position);
         }
-    }
-    protected void UpdateRaceState()
-    {
 
         float distanceToPlayer = Vector3.Distance(transform.position, playerTransform.position);
+        if (distanceToPlayer <= chaseRange)
         {
-            if (distanceToPlayer > chaseRange)
-            {
-                nav.SetDestination(targetTransform.position);
-            }
-            else
-            {
-                currentState = EnemyState.Chase;
-            }
+            currentState = EnemyState.Chase;
         }
     }
+
     protected void UpdatePushState()
     {
         float distanceToPlayer = Vector3.Distance(transform.position, playerTransform.position);
@@ -115,5 +122,16 @@ public class PusherEnemy : MonoBehaviour
         }
     }
 
- 
+    void OnDrawGizmos()
+    {
+        Gizmos.color = Color.red;
+        Gizmos.DrawWireSphere(transform.position, pushRadius);
+        Gizmos.color = Color.blue;
+        Gizmos.DrawWireSphere(transform.position, chaseRange);
+        //draw gizmo for current direction
+        Gizmos.color = Color.green;
+        Gizmos.DrawLine(transform.position, transform.position + transform.forward * 2);
+
+    }
+
 }
